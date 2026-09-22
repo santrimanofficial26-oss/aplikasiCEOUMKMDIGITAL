@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>CEO2024 - DIGITAL UMKM | Platform Bisnis & Ekosistem UMKM</title>
+
+    <!-- PWA Settings & Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#020617">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CEO UMKM">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="CEO UMKM">
+    <meta name="msapplication-TileColor" content="#059669">
+
+    <!-- Favicon & Icons -->
+    <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+
+    <!-- SEO & Social OpenGraph -->
+    <meta name="description" content="Platform Produk Digital, Produk Fisik, Event & Solusi Bisnis UMKM Naik Kelas. Terintegrasi QRIS Otomatis Pakasir.">
+    <meta property="og:title" content="CEO2024 - DIGITAL UMKM">
+    <meta property="og:description" content="Platform Produk Digital, Produk Fisik, Event & Solusi Bisnis UMKM Naik Kelas.">
+    <meta property="og:image" content="icons/icon-512.png">
+    <meta property="og:type" content="website">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #020617;
+            color: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            position: fixed;
+            inset: 0;
+        }
+
+        /* Iframe Utama Full Screen */
+        #app-frame {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            border: none;
+            outline: none;
+            display: block;
+            z-index: 10;
+            background-color: #020617;
+        }
+
+        /* Splash Screen Preloader */
+        #splash-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at 50% 40%, #0f172a 0%, #020617 100%);
+            transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.5s;
+            padding: 24px;
+        }
+
+        #splash-screen.fade-out {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .splash-logo-container {
+            width: 110px;
+            height: 110px;
+            border-radius: 28px;
+            padding: 6px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 182, 212, 0.1));
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            box-shadow: 0 0 35px rgba(16, 185, 129, 0.35), 0 0 60px rgba(6, 182, 212, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            animation: pulse-glow 3s infinite ease-in-out;
+        }
+
+        .splash-logo-container img,
+        .splash-logo-container svg {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 22px;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+                box-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
+            }
+            50% {
+                transform: translateY(-5px) scale(1.03);
+                box-shadow: 0 0 45px rgba(16, 185, 129, 0.6), 0 0 70px rgba(6, 182, 212, 0.3);
+            }
+        }
+
+        .splash-title {
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            background: linear-gradient(135deg, #ffffff 30%, #34d399 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 6px;
+        }
+
+        .splash-subtitle {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: #10b981;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* Loading Bar Shimmer */
+        .loading-bar-wrap {
+            width: 180px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .loading-bar-inner {
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, #10b981, #06b6d4, transparent);
+            border-radius: 999px;
+            animation: shimmer-load 1.8s infinite ease-in-out;
+        }
+
+        @keyframes shimmer-load {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .loading-text {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 14px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Floating PWA Install Banner */
+        #pwa-banner {
+            position: fixed;
+            top: 14px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-120%);
+            z-index: 45;
+            width: calc(100% - 32px);
+            max-width: 440px;
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            border-radius: 20px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(16, 185, 129, 0.2);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        #pwa-banner.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .pwa-banner-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            margin-right: 12px;
+            flex-shrink: 0;
+            overflow: hidden;
+            border: 1px solid rgba(16, 185, 129, 0.5);
+            background: #020617;
+        }
+
+        .pwa-banner-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .pwa-banner-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .pwa-banner-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .pwa-banner-desc {
+            font-size: 11px;
+            color: #34d399;
+        }
+
+        .pwa-banner-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: 10px;
+            flex-shrink: 0;
+        }
+
+        .btn-install {
+            padding: 7px 14px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #020617;
+            font-size: 12px;
+            font-weight: 800;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+            transition: all 0.2s;
+        }
+
+        .btn-install:active {
+            transform: scale(0.95);
+        }
+
+        .btn-close-banner {
+            width: 28px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            border-radius: 50%;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .btn-close-banner:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Offline Bar */
+        #offline-notice {
+            display: none;
+            position: fixed;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 45;
+            background: #ef4444;
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 8px 18px;
+            border-radius: 999px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Floating PWA Install Prompt -->
+    <div id="pwa-banner">
+        <div class="pwa-banner-icon">
+            <img src="icons/icon-192.png" alt="App Icon" onerror="this.src='icons/icon.svg'">
+        </div>
+        <div class="pwa-banner-info">
+            <div class="pwa-banner-title">CEO UMKM App</div>
+            <div class="pwa-banner-desc">Pasang di Layar Utama HP</div>
+        </div>
+        <div class="pwa-banner-actions">
+            <button type="button" class="btn-install" onclick="triggerPwaInstall()">Pasang</button>
+            <button type="button" class="btn-close-banner" onclick="closePwaBanner()">&times;</button>
+        </div>
+    </div>
+
+    <!-- Splash Screen Preloader -->
+    <div id="splash-screen">
+        <div class="splash-logo-container">
+            <img src="icons/icon.svg" alt="CEO UMKM Logo">
+        </div>
+        <div class="splash-title">CEO2024 - DIGITAL UMKM</div>
+        <div class="splash-subtitle">Platform Bisnis & Ekosistem UMKM</div>
+        <div class="loading-bar-wrap">
+            <div class="loading-bar-inner"></div>
+        </div>
+        <div class="loading-text">Menghubungkan ke server aplikasi...</div>
+    </div>
+
+    <!-- Offline Status Indicator -->
+    <div id="offline-notice">⚠️ Koneksi internet terputus (Offline)</div>
+
+    <!-- Iframe Container Google Apps Script -->
+    <iframe id="app-frame" 
+            title="CEO2024 Digital UMKM WebApp"
+            allow="camera; microphone; geolocation; payment; clipboard-read; clipboard-write; autoplay; fullscreen" 
+            sandbox="allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-downloads"
+            loading="eager">
+    </iframe>
+
+    <script>
+        // ========================================================
+        // KONFIGURASI URL GOOGLE APPS SCRIPT WEBAPP
+        // ========================================================
+        const APPSCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4tRpSIu6E_i_rzOuHkXK-brDN-GX0NGgXOuMCdlHdse_Va0A5rEXHeUiivhgcqwLUHA/exec";
+
+        const frame = document.getElementById('app-frame');
+        const splash = document.getElementById('splash-screen');
+        const pwaBanner = document.getElementById('pwa-banner');
+        const offlineNotice = document.getElementById('offline-notice');
+
+        // Meneruskan parameter query string dan hash dari custom domain ke AppScript
+        // Contoh: https://ceoumkm.id/?ref=budi#katalog -> diteruskan ke iframe!
+        const currentSearch = window.location.search || '';
+        const currentHash = window.location.hash || '';
+        const fullAppUrl = APPSCRIPT_URL + currentSearch + currentHash;
+
+        frame.src = fullAppUrl;
+
+        // Dismiss splash screen ketika iframe telah selesai loading
+        let splashDismissed = false;
+        function dismissSplash() {
+            if (splashDismissed) return;
+            splashDismissed = true;
+            splash.classList.add('fade-out');
+            setTimeout(() => {
+                splash.style.display = 'none';
+            }, 600);
+        }
+
+        frame.addEventListener('load', () => {
+            dismissSplash();
+        });
+
+        // Fallback safety: jika koneksi lambat, sembunyikan splash screen setelah 6 detik
+        setTimeout(() => {
+            dismissSplash();
+        }, 6000);
+
+        // ========================================================
+        // REGISTRASI SERVICE WORKER PWA
+        // ========================================================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((registration) => {
+                        console.log('Vercel PWA Shell Service Worker terdaftar:', registration.scope);
+                    })
+                    .catch((err) => {
+                        console.warn('Vercel PWA Service Worker gagal didaftarkan:', err);
+                    });
+            });
+        }
+
+        // ========================================================
+        // PWA BEFOREINSTALLPROMPT HANDLER
+        // ========================================================
+        let deferredPrompt = null;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            console.log('beforeinstallprompt ditangkap di Vercel Wrapper');
+
+            // Tampilkan floating install banner setelah 2 detik
+            setTimeout(() => {
+                if (pwaBanner) pwaBanner.classList.add('visible');
+            }, 2000);
+        });
+
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA CEO UMKM berhasil diinstall di perangkat!');
+            deferredPrompt = null;
+            if (pwaBanner) pwaBanner.classList.remove('visible');
+        });
+
+        function triggerPwaInstall() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choice) => {
+                    if (choice.outcome === 'accepted') {
+                        console.log('User menginstal PWA');
+                    }
+                    deferredPrompt = null;
+                    if (pwaBanner) pwaBanner.classList.remove('visible');
+                });
+            } else {
+                // Fallback informasi jika browser belum memicu prompt
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                if (isIOS) {
+                    alert('Untuk memasang di iPhone/iPad:\n1. Tekan tombol Share di Safari (ikon kotak panah ke atas).\n2. Pilih "Add to Home Screen" (Tambah ke Layar Utama).\n3. Tekan "Add".');
+                } else {
+                    alert('Untuk memasang di HP:\nTekan menu titik tiga (⋮) di pojok kanan atas browser lalu pilih "Pasang aplikasi" / "Tambahkan ke Layar Utama".');
+                }
+            }
+        }
+
+        function closePwaBanner() {
+            if (pwaBanner) pwaBanner.classList.remove('visible');
+        }
+
+        // ========================================================
+        // DETEKSI KONEKSI ONLINE / OFFLINE
+        // ========================================================
+        window.addEventListener('online', () => {
+            if (offlineNotice) offlineNotice.style.display = 'none';
+        });
+
+        window.addEventListener('offline', () => {
+            if (offlineNotice) offlineNotice.style.display = 'block';
+        });
+    </script>
+</body>
+
+</html>
