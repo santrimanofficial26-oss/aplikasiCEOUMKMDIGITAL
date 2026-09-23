@@ -1,7 +1,7 @@
 {
-  "name": "CEO2024 - DIGITAL UMKM",
-  "short_name": "CEO UMKM",
-  "description": "Platform Produk Digital, Produk Fisik, Event & Solusi Bisnis UMKM Naik Kelas",
+  "name": "CEO2024-DIGITAL UMKM",
+  "short_name": "CEO2024-DIGITAL UMKM",
+  "description": "Teman Tepat UMKM Hebat - Platform Produk Digital & Fisik CEO UMKM",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
