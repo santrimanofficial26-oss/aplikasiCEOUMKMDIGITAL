@@ -10,7 +10,7 @@ Write-Host ""
 Write-Host "[1/3] Menambahkan perubahan (git add .)..." -ForegroundColor Green
 git add .
 
-$defaultMsg = "feat: pembaruan logo 3D, brand CEO2024-DIGITAL UMKM, dan slogan neon"
+$defaultMsg = "feat: sinkronisasi tema light dark mode, palet warna mobile dock dan pwa shell"
 $msg = Read-Host "Masukkan pesan commit (Tekan Enter untuk default: '$defaultMsg')"
 if ([string]::IsNullOrWhiteSpace($msg)) {
     $msg = $defaultMsg

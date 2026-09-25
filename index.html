@@ -294,6 +294,47 @@
             border-radius: 999px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
         }
+    
+        /* Light Mode Adaptive Styles for Shell */
+        html.light body {
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+
+        html.light #app-frame {
+            background-color: #f8fafc;
+        }
+
+        html.light #pwa-banner {
+            background: rgba(255, 255, 255, 0.96);
+            border-color: #e2e8f0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 0 20px rgba(16, 185, 129, 0.15);
+        }
+
+        html.light .pwa-banner-title {
+            color: #0f172a;
+        }
+
+        html.light .pwa-banner-desc {
+            color: #b45309;
+            text-shadow: none;
+        }
+
+        html.light .pwa-banner-icon {
+            background: #ffffff;
+            border-color: #e2e8f0;
+        }
+
+        html.light .btn-close-banner {
+            background: rgba(0, 0, 0, 0.06);
+            color: #64748b;
+        }
+
+        html.light .btn-close-banner:hover {
+            color: #0f172a;
+            background: rgba(0, 0, 0, 0.12);
+        }
+
     </style>
 </head>
 
@@ -340,6 +381,48 @@
 
     <script>
         // ========================================================
+        
+        // ========================================================
+        // SINKRONISASI TEMA (LIGHT / DARK) DARI IFRAME APLIKASI
+        // ========================================================
+        const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+
+        function applyShellTheme(isDark) {
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+                document.documentElement.classList.remove('light');
+                document.body.style.backgroundColor = '#020617';
+                if (metaThemeColor) metaThemeColor.setAttribute('content', '#020617');
+                if (pwaBanner) {
+                    pwaBanner.style.background = 'rgba(15, 23, 42, 0.94)';
+                    pwaBanner.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+                }
+            } else {
+                document.documentElement.classList.add('light');
+                document.documentElement.classList.remove('dark');
+                document.body.style.backgroundColor = '#f8fafc';
+                if (metaThemeColor) metaThemeColor.setAttribute('content', '#f8fafc');
+                if (pwaBanner) {
+                    pwaBanner.style.background = 'rgba(255, 255, 255, 0.96)';
+                    pwaBanner.style.borderColor = '#e2e8f0';
+                }
+            }
+        }
+
+        // Baca cache tema awal jika tersimpan
+        try {
+            const savedTheme = localStorage.getItem('landing_theme');
+            if (savedTheme === 'light') applyShellTheme(false);
+            else applyShellTheme(true);
+        } catch(e) {}
+
+        // Tangkap event postMessage dari iframe saat tema di-toggle
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'THEME_CHANGE') {
+                applyShellTheme(event.data.isDark);
+            }
+        });
+
         // KONFIGURASI URL GOOGLE APPS SCRIPT WEBAPP
         // ========================================================
         const APPSCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4tRpSIu6E_i_rzOuHkXK-brDN-GX0NGgXOuMCdlHdse_Va0A5rEXHeUiivhgcqwLUHA/exec";

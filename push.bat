@@ -12,7 +12,7 @@ git add .
 
 set /p commit_msg="Masukkan pesan commit (Tekan Enter untuk default): "
 if "%commit_msg%"=="" (
-    set commit_msg=feat: pembaruan logo 3D, brand CEO2024-DIGITAL UMKM, dan slogan neon
+    set commit_msg=feat: sinkronisasi tema light dark mode, palet warna mobile dock dan pwa shell
 )
 
 echo.
