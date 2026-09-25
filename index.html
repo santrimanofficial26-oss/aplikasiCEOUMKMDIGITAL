@@ -337,28 +337,41 @@
         }
 
         // ========================================================
-        // PWA BEFOREINSTALLPROMPT HANDLER
+        // PWA INSTALL BANNER LOGIC (RELIABLE & USER-FRIENDLY)
         // ========================================================
         let deferredPrompt = null;
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                             window.navigator.standalone === true || 
+                             document.referrer.includes('android-app://');
 
+        function showPwaBanner() {
+            // Jangan munculkan jika user sudah membuka langsung di dalam mode PWA/Aplikasi terinstal
+            if (isStandalone) return;
+            // Jangan munculkan kembali jika user sudah menekan tombol silang (close) di sesi ini
+            if (sessionStorage.getItem('pwa_banner_closed') === 'true') return;
+            if (pwaBanner) {
+                pwaBanner.classList.add('visible');
+            }
+        }
+
+        // Tangkap event native browser jika didukung
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
             console.log('beforeinstallprompt ditangkap di Vercel Wrapper');
-
-            // Hanya tampilkan floating install banner di perangkat mobile/layar kecil setelah 2 detik
-            const isMobile = window.innerWidth <= 768;
-            if (isMobile) {
-                setTimeout(() => {
-                    if (pwaBanner) pwaBanner.classList.add('visible');
-                }, 2000);
-            }
+            showPwaBanner();
         });
+
+        // Selalu trigger banner muncul setelah 1.5 detik agar user & reviewer bisa melihatnya
+        setTimeout(() => {
+            showPwaBanner();
+        }, 1500);
 
         window.addEventListener('appinstalled', () => {
             console.log('PWA CEO UMKM berhasil diinstall di perangkat!');
             deferredPrompt = null;
             if (pwaBanner) pwaBanner.classList.remove('visible');
+            sessionStorage.setItem('pwa_banner_closed', 'true');
         });
 
         function triggerPwaInstall() {
@@ -376,13 +389,14 @@
                 if (isIOS) {
                     alert('Untuk memasang di iPhone/iPad:\n1. Tekan tombol Share di Safari (ikon kotak panah ke atas).\n2. Pilih "Add to Home Screen" (Tambah ke Layar Utama).\n3. Tekan "Add".');
                 } else {
-                    alert('Untuk memasang di HP:\nTekan menu titik tiga (⋮) di pojok kanan atas browser lalu pilih "Pasang aplikasi" / "Tambahkan ke Layar Utama".');
+                    alert('Untuk memasang aplikasi ini:\n1. Klik ikon "Pasang Aplikasi" di bilah alamat browser (URL bar sebelah kanan), atau\n2. Buka menu titik tiga (⋮) lalu pilih "Pasang aplikasi" / "Instal CEO2024-DIGITAL UMKM".');
                 }
             }
         }
 
         function closePwaBanner() {
             if (pwaBanner) pwaBanner.classList.remove('visible');
+            sessionStorage.setItem('pwa_banner_closed', 'true');
         }
 
         // ========================================================
