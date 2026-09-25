@@ -49,7 +49,7 @@
             inset: 0;
         }
 
-        /* Iframe Utama Full Screen (Langsung tampil instan tanpa preloader) */
+        /* Iframe Utama Full Screen (Langsung tampil instan tanpa preloader/splash) */
         #app-frame {
             position: fixed;
             top: 0;
@@ -64,29 +64,42 @@
             background-color: #f8fafc;
         }
 
-        /* ================= FLOATING PWA INSTALL BANNER (LIGHT FIRST) ================= */
+        /* ================= FLOATING PWA INSTALL BANNER (ZERO ARTIFACTS) ================= */
+        /* Default: display: none! Tidak dirender, tidak ada bayangan/garis nyangkut di atas */
         #pwa-banner {
+            display: none;
             position: fixed;
             top: 14px;
             left: 50%;
-            transform: translateX(-50%) translateY(-120%);
+            transform: translateX(-50%);
             z-index: 45;
             width: calc(100% - 32px);
             max-width: 440px;
-            background: rgba(255, 255, 255, 0.96);
+            background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid #e2e8f0;
             border-radius: 20px;
             padding: 10px 14px;
-            display: flex;
             align-items: center;
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.1), 0 2px 8px rgba(0, 0, 0, 0.04);
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(0, 0, 0, 0.03);
         }
 
+        /* Hanya tampil dan animasi saat class visible aktif */
         #pwa-banner.visible {
-            transform: translateX(-50%) translateY(0);
+            display: flex !important;
+            animation: pwaSlideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes pwaSlideDown {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-25px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
         }
 
         .pwa-banner-icon {
@@ -98,7 +111,7 @@
             overflow: hidden;
             border: 1px solid #e2e8f0;
             background: #ffffff;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
         }
 
         .pwa-banner-icon img {
@@ -188,7 +201,7 @@
             font-weight: 700;
             padding: 8px 18px;
             border-radius: 999px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
         }
 
         /* ================= DARK MODE OVERRIDES (ADAPTIVE) ================= */
@@ -234,7 +247,7 @@
 
 <body>
 
-    <!-- Floating PWA Install Prompt (Light White by Default) -->
+    <!-- Floating PWA Install Prompt (Default display: none; NO leak, NO shadow residue) -->
     <div id="pwa-banner">
         <div class="pwa-banner-icon">
             <img src="icons/icon-192.png" alt="App Icon" onerror="this.src='icons/icon.svg'">
@@ -252,7 +265,7 @@
     <!-- Offline Status Indicator -->
     <div id="offline-notice">⚠️ Koneksi internet terputus (Offline)</div>
 
-    <!-- Iframe Container Google Apps Script (Langsung tampil instan) -->
+    <!-- Iframe Container Google Apps Script (Langsung tampil instan tanpa preloader) -->
     <iframe id="app-frame" 
             title="CEO2024 Digital UMKM WebApp"
             allow="camera; microphone; geolocation; payment; clipboard-read; clipboard-write; autoplay; fullscreen" 
@@ -333,10 +346,13 @@
             deferredPrompt = e;
             console.log('beforeinstallprompt ditangkap di Vercel Wrapper');
 
-            // Tampilkan floating install banner setelah 2 detik
-            setTimeout(() => {
-                if (pwaBanner) pwaBanner.classList.add('visible');
-            }, 2000);
+            // Hanya tampilkan floating install banner di perangkat mobile/layar kecil setelah 2 detik
+            const isMobile = window.innerWidth <= 768;
+            if (isMobile) {
+                setTimeout(() => {
+                    if (pwaBanner) pwaBanner.classList.add('visible');
+                }, 2000);
+            }
         });
 
         window.addEventListener('appinstalled', () => {
